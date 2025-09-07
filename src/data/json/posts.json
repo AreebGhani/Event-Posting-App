@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1757267600157",
+    "contentText": "Hey, here is my first event post.\n\nhttps://www.meetup.com/coderrange-ai-bigdata-datascience/events/308329804/?utm_medium=referral&utm_campaign=share-btn_savedevents_share_modal&utm_source=link&utm_version=v2\n\nhttps://luma.com/r00n7tc8",
+    "events": [
+      {
+        "platform": "Meetup",
+        "title": "Architecting the Cloud: DevOps & System Design Master",
+        "hostedBy": "venkatesh D.",
+        "date": "Monday, September 8, 2025",
+        "time": "8:00 PM GMT+5",
+        "locationName": "Online event",
+        "imageUrl": "https://secure.meetupstatic.com/photos/event/9/c/2/3/600_527199971.jpeg",
+        "description": "### 🧠 **Overview:**\n\nJoin us for an immersive session where we delve into the intricacies of system architecture within the realms of DevOps and cloud computing. This even",
+        "attendees": 0,
+        "mapEmbedUrl": null,
+        "sourceUrl": "https://www.meetup.com/coderrange-ai-bigdata-datascience/events/308329804/?utm_medium=referral&utm_campaign=share-btn_savedevents_share_modal&utm_source=link&utm_version=v2"
+      },
+      {
+        "platform": "Luma",
+        "title": "Zurich AI Festival Workspace",
+        "hostedBy": "Valeria Bella, Lisa Brandenberger, Jeanique",
+        "date": "Monday, September 29, 2025",
+        "time": "11:00 AM GMT+5",
+        "locationName": "FlexOffice Zürich Dino - Office Space & Workspace für dein Team",
+        "imageUrl": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=500,height=500/event-covers/mt/e7226ba4-dcf7-4562-a4ec-de78afe3730c.png",
+        "description": "Need a quiet moment during the Zurich AI Festival?\nStep into FlexOffice Oerlikon, your free silent workspace during the festival.\nWhether you’re catching up on work, recharging between sessions, or sparking a quiet conversation, this calm, well-equipped space is here for you.\nWhere tech meets community: FlexOffice is proud to host the festival’s silent hub, supporting focus, connection, and meaningful moments in the middle of the buzz.\nEveryone with a festival pass is welcome to use the silent workspace at no additional cost.\n+++ This offering is part of the Zurich AI Festival, taking place from September 29 to October 4, 2025. \nZurich AI Festival unites the minds building the future - visionary founders, bold investors, and tech leaders shaping tomorrow. Connect to tomorrow!\nWe look forward to welcoming you soon!\nZurich AI Festival Team",
+        "attendees": 0,
+        "mapEmbedUrl": "https://www.openstreetmap.org/export/embed.html?bbox=8.531772700000001,47.4021898,8.5517727,47.4221898&layer=mapnik&marker=47.4121898,8.541772700000001",
+        "sourceUrl": "https://luma.com/r00n7tc8"
+      }
+    ]
+  }
+]
