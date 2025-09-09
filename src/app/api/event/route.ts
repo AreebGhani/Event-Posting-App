@@ -1,7 +1,15 @@
+import { Buffer } from "buffer";
+
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
+import axios from "axios";
 
 import type { EventData } from "@/types";
+
+const UNSPLASH_ACCESS_KEY = "lupsuJwSHzl-hAAA1me5EZbeKacjVF4Cm9pUrMm7G5M";
+const PIXABAY_API_KEY = "21909999-a5b2602ec6aa06aabab58a594";
+const PEXELS_API_KEY =
+  "hRtAlADLthp4daarvjmTMwOF8yQxrwbZqk8zclrdmTStJzXH7shZuuph";
 
 async function getPage(url: string) {
   const response = await fetch(url, {
@@ -197,6 +205,126 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         message: `Error getting event: ${
+          error instanceof Error ? error.message : "something went wrong"
+        }`,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { eventTitle } = await request.json();
+    if (!eventTitle) {
+      return NextResponse.json(
+        { message: "Event title is required" },
+        { status: 400 }
+      );
+    }
+    let imageUrl = null;
+    let source = "unknown";
+    const randomParam = Math.random().toString(36).substring(7);
+    try {
+      const page = Math.floor(Math.random() * 5) + 1;
+      const unsplashResponse = await axios.get(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+          eventTitle
+        )}&per_page=1&page=${page}&${randomParam}`,
+        {
+          headers: {
+            Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
+          },
+        }
+      );
+      if (unsplashResponse.data.results.length > 0) {
+        imageUrl = unsplashResponse.data.results[0].urls.regular;
+        source = "unsplash";
+      }
+    } catch (unsplashError) {
+      console.log("Unsplash API error:", unsplashError);
+    }
+    if (!imageUrl) {
+      try {
+        const page = Math.floor(Math.random() * 5) + 1;
+        const randomParam = `random=${Date.now()}`;
+        const pixabayResponse = await axios.get(
+          `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(
+            eventTitle
+          )}&page=${page}&${randomParam}`
+        );
+        if (pixabayResponse.data.hits.length > 0) {
+          imageUrl = pixabayResponse.data.hits[0].webformatURL;
+          source = "pixabay";
+        }
+      } catch (pixabayError) {
+        console.error("Pixabay API error:", pixabayError);
+      }
+    }
+    if (!imageUrl) {
+      try {
+        const response = await axios.get(
+          `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+            eventTitle
+          )}&per_page=10`,
+          {
+            headers: {
+              Authorization: PEXELS_API_KEY,
+            },
+          }
+        );
+        const photos = response.data.photos;
+        if (photos.length > 0) {
+          const randomIndex = Math.floor(Math.random() * photos.length);
+          imageUrl = photos[randomIndex].src.large;
+          source = "pexels";
+        }
+        if (imageUrl && !imageUrl.startsWith("http")) {
+          imageUrl = null;
+        }
+      } catch (pexelsError) {
+        console.log("Pexels API error:", pexelsError);
+      }
+    }
+    if (!imageUrl) {
+      return NextResponse.json(
+        { message: "Could not find a suitable image" },
+        { status: 404 }
+      );
+    }
+    try {
+      const cacheBustedUrl = imageUrl.includes("?")
+        ? `${imageUrl}&${randomParam}`
+        : `${imageUrl}?${randomParam}`;
+      const imageResponse = await axios.get(cacheBustedUrl, {
+        responseType: "arraybuffer",
+      });
+      const base64Image = Buffer.from(imageResponse.data).toString("base64");
+      const contentType = imageResponse.headers["content-type"] || "image/jpeg";
+      return NextResponse.json(
+        {
+          image: `data:${contentType};base64,${base64Image}`,
+          source: source,
+          imageUrl: imageUrl,
+        },
+        { status: 200 }
+      );
+    } catch (downloadError) {
+      console.log("Image download error:", downloadError);
+      return NextResponse.json(
+        {
+          imageUrl: imageUrl,
+          source: source,
+          message: "Found image but could not download it",
+        },
+        { status: 200 }
+      );
+    }
+  } catch (error) {
+    console.log("Error generating image:", error);
+    return NextResponse.json(
+      {
+        message: `Error generating image: ${
           error instanceof Error ? error.message : "something went wrong"
         }`,
       },

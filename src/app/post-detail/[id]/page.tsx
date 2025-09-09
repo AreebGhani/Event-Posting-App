@@ -49,7 +49,7 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-2 lg:p-6">
         <DetailLoader />
       </div>
     );
