@@ -112,7 +112,7 @@ export default function EventImageGenerator() {
             Event Image Generator
           </h1>
           <p className="text-xl text-gray-300">
-            Create AI-generated images for your events using open-source tools
+            Create AI-generated images for your events
           </p>
         </header>
         <div className="bg-white/5 backdrop-blur-md rounded-2xl p-8 mb-8 border border-white/10 shadow-2xl">
@@ -160,14 +160,14 @@ export default function EventImageGenerator() {
                   Generating...
                 </>
               ) : (
-                "Generate AI Images"
+                "Generate AI Image"
               )}
             </button>
             <button
               onClick={clearResults}
               className="px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg cursor-pointer transition-transform hover:scale-105"
             >
-              Clear Results
+              Clear Result
             </button>
             {exampleEvents.map((event, index) => (
               <button
@@ -183,63 +183,79 @@ export default function EventImageGenerator() {
         <div
           className={`mt-12 ${generatedImages.length > 0 ? "block" : "hidden"}`}
         >
-          <h2 className="text-2xl font-semibold mb-6">Generated Images</h2>
+          <h2 className="text-2xl font-semibold mb-6">Generated Image</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {generatedImages.map((image) => {
-              const hue = hues[image.id] || 0;
-              const displaySrc = image.image || image.imageUrl || "";
-              return (
-                <div
-                  key={image.id}
-                  className="bg-gray-800 rounded-xl overflow-hidden transition-transform hover:-translate-y-2"
-                >
-                  <div className="h-48 w-full relative">
-                    {!error && displaySrc ? (
-                      <Image
-                        src={displaySrc}
-                        alt={image.title}
-                        fill
-                        className="object-cover"
-                        onError={() => setError(true)}
-                      />
-                    ) : (
-                      <div
-                        className="h-48 flex items-center justify-center font-semibold"
-                        style={{
-                          background: `linear-gradient(45deg, hsl(${hue}, 70%, 40%), hsl(${
-                            hue + 40
-                          }, 70%, 60%))`,
-                        }}
-                      >
-                        Image failed to load
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-blue-300 mb-2">
-                      {image.title}
-                    </h3>
-                    <p className="text-gray-300 mb-2">
-                      {image.description.substring(0, 100)}...
-                    </p>
-                    <p className="text-sm text-gray-500 mb-3">
-                      Source: {image.source}
-                    </p>
-                    {image.imageUrl && (
-                      <button
-                        onClick={() => window.open(image.imageUrl, "_blank")}
-                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm text-white cursor-pointer"
-                      >
-                        View Image
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+            {generatedImages.map((image, i: number) => (
+              <EventCard
+                key={i}
+                image={image}
+                hues={hues}
+                error={error}
+                setError={setError}
+              />
+            ))}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+type Props = {
+  image: GeneratedImage;
+  hues: Record<number, number>;
+  error: boolean;
+  setError: (val: boolean) => void;
+};
+
+const EventCard = ({ image, hues, error, setError }: Props) => {
+  const hue = hues[image.id] || 0;
+  const displaySrc = image.image || image.imageUrl || "";
+  return (
+    <div
+      key={image.id}
+      className="bg-gray-800 rounded-xl overflow-hidden transition-transform hover:-translate-y-2"
+    >
+      <div className="h-48 w-full relative">
+        <div className={`${!error && displaySrc ? "block" : "hidden"}`}>
+          <Image
+            src={displaySrc}
+            alt={image.title}
+            fill
+            className="object-cover"
+            onError={() => setError(true)}
+          />
+        </div>
+        <div
+          className={`h-48 items-center justify-center font-semibold ${
+            !error && displaySrc ? "hidden" : "flex"
+          }`}
+          style={{
+            background: `linear-gradient(45deg, hsl(${hue}, 70%, 40%), hsl(${
+              hue + 40
+            }, 70%, 60%))`,
+          }}
+        >
+          Image failed to load
+        </div>
+      </div>
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-blue-300 mb-2">
+          {image.title}
+        </h3>
+        <p className="text-gray-300 mb-2">
+          {image.description.substring(0, 100)}...
+        </p>
+        <p className="text-sm text-gray-500 mb-3">Source: {image.source}</p>
+        <button
+          onClick={() => window.open(image.imageUrl, "_blank")}
+          className={`px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm text-white cursor-pointer ${
+            image.imageUrl ? "block" : "hidden"
+          }`}
+        >
+          View Image
+        </button>
+      </div>
+    </div>
+  );
+};
