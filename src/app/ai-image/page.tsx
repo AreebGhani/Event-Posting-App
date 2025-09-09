@@ -13,6 +13,10 @@ interface GeneratedImage {
   source: string;
 }
 
+const initialTitle = "Summer Music Festival";
+const initialDescription =
+  "A vibrant outdoor music festival with multiple stages, food vendors, and art installations. Happening in July with top artists from around the world.";
+
 const exampleEvents = [
   {
     title: "AI Tech Conference",
@@ -27,13 +31,12 @@ const exampleEvents = [
 ];
 
 export default function EventImageGenerator() {
-  const [eventTitle, setEventTitle] = useState("Summer Music Festival");
-  const [eventDescription, setEventDescription] = useState(
-    "A vibrant outdoor music festival with multiple stages, food vendors, and art installations. Happening in July with top artists from around the world."
-  );
+  const [eventTitle, setEventTitle] = useState(initialTitle);
+  const [eventDescription, setEventDescription] = useState(initialDescription);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hues, setHues] = useState<Record<number, number>>({});
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     if (generatedImages.length > 0) {
@@ -92,6 +95,8 @@ export default function EventImageGenerator() {
   const clearResults = () => {
     setGeneratedImages([]);
     setHues({});
+    setEventTitle(initialTitle);
+    setEventDescription(initialDescription);
   };
 
   const loadExample = (title: string, description: string) => {
@@ -175,35 +180,28 @@ export default function EventImageGenerator() {
             ))}
           </div>
         </div>
-        {generatedImages.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-semibold mb-6">Generated Images</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {generatedImages.map((image) => {
-                const hue = hues[image.id] || 0;
-                const displaySrc = image.image || image.imageUrl || "";
-                return (
-                  <div
-                    key={image.id}
-                    className="bg-gray-800 rounded-xl overflow-hidden transition-transform hover:-translate-y-2"
-                  >
-                    {displaySrc ? (
-                      <div className="h-48 w-full relative">
-                        <Image
-                          src={displaySrc}
-                          alt={image.title}
-                          fill
-                          className="object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = "none";
-                            const fallback = document.getElementById(
-                              `fallback-${image.id}`
-                            );
-                            if (fallback) fallback.style.display = "flex";
-                          }}
-                        />
-                      </div>
+        <div
+          className={`mt-12 ${generatedImages.length > 0 ? "block" : "hidden"}`}
+        >
+          <h2 className="text-2xl font-semibold mb-6">Generated Images</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {generatedImages.map((image) => {
+              const hue = hues[image.id] || 0;
+              const displaySrc = image.image || image.imageUrl || "";
+              return (
+                <div
+                  key={image.id}
+                  className="bg-gray-800 rounded-xl overflow-hidden transition-transform hover:-translate-y-2"
+                >
+                  <div className="h-48 w-full relative">
+                    {!error && displaySrc ? (
+                      <Image
+                        src={displaySrc}
+                        alt={image.title}
+                        fill
+                        className="object-cover"
+                        onError={() => setError(true)}
+                      />
                     ) : (
                       <div
                         className="h-48 flex items-center justify-center font-semibold"
@@ -213,45 +211,34 @@ export default function EventImageGenerator() {
                           }, 70%, 60%))`,
                         }}
                       >
-                        Image Preview
+                        Image failed to load
                       </div>
                     )}
-                    <div
-                      id={`fallback-${image.id}`}
-                      className="h-48 hidden items-center justify-center font-semibold"
-                      style={{
-                        background: `linear-gradient(45deg, hsl(${hue}, 70%, 40%), hsl(${
-                          hue + 40
-                        }, 70%, 60%))`,
-                      }}
-                    >
-                      Image failed to load
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-blue-300 mb-2">
-                        {image.title}
-                      </h3>
-                      <p className="text-gray-300 mb-2">
-                        {image.description.substring(0, 100)}...
-                      </p>
-                      <p className="text-sm text-gray-500 mb-3">
-                        Source: {image.source}
-                      </p>
-                      {image.imageUrl && (
-                        <button
-                          onClick={() => window.open(image.imageUrl, "_blank")}
-                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm text-white cursor-pointer"
-                        >
-                          View Image
-                        </button>
-                      )}
-                    </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-blue-300 mb-2">
+                      {image.title}
+                    </h3>
+                    <p className="text-gray-300 mb-2">
+                      {image.description.substring(0, 100)}...
+                    </p>
+                    <p className="text-sm text-gray-500 mb-3">
+                      Source: {image.source}
+                    </p>
+                    {image.imageUrl && (
+                      <button
+                        onClick={() => window.open(image.imageUrl, "_blank")}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm text-white cursor-pointer"
+                      >
+                        View Image
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
