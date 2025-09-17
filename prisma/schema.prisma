@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AttendeeStatus {
+  REGISTERED
+  CANCELLED
+  CHECKED_IN
+  NO_SHOW
+}
+
+enum EventType {
+  MEETUP
+  CONFERENCE
+  WORKSHOP
+  HACKATHON
+  WEBINAR
+  CODE_REVIEW
+  NETWORKING
+}
+
+model DeveloperPortalDeveloperUser {
+  devuserid String @id
+  username      String
+  email     String @unique
+
+  // Events this user organized
+  eventsOrganized DeveloperPortalEvent[] @relation("OrganizerRelation")
+
+  // Events this user is attending
+  eventAttendances DeveloperPortalEventAttendee[] @relation("AttendeeRelation")
+
+  @@map("developer_portal_developer_users")
+}
+
+model DeveloperPortalEvent {
+  id                               String                         @id(map: "events_pkey") @default(cuid())
+  title                            String
+  description                      String
+  date                             DateTime
+  location                         String
+  organizerId                      String
+  maxAttendees                     Int?
+  type                             EventType
+  tags                             String[]
+  googleCalendarLink               String?
+  microsoftCalendarLink            String?
+  isPublished                      Boolean                        @default(true)
+  createdAt                        DateTime                       @default(now())
+  updatedAt                        DateTime
+  developer_portal_event_attendees DeveloperPortalEventAttendee[]
+
+  // Organizer relation must be on one line
+  organizer DeveloperPortalDeveloperUser @relation("OrganizerRelation", fields: [organizerId], references: [devuserid], onDelete: Cascade, map: "events_organizerId_fkey")
+
+  @@map("developer_portal_events")
+}
+
+model DeveloperPortalEventAttendee {
+  id           String         @id(map: "event_attendees_pkey") @default(cuid())
+  eventId      String
+  userId       String
+  status       AttendeeStatus @default(REGISTERED)
+  registeredAt DateTime       @default(now())
+
+  developer_portal_events          DeveloperPortalEvent         @relation(fields: [eventId], references: [id], onDelete: Cascade, map: "event_attendees_eventId_fkey")
+  developer_portal_developer_users DeveloperPortalDeveloperUser @relation("AttendeeRelation", fields: [userId], references: [devuserid], onDelete: Cascade, map: "event_attendees_userId_fkey")
+
+  @@unique([eventId, userId], map: "event_attendees_eventId_userId_key")
+  @@map("developer_portal_event_attendees")
+}

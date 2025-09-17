@@ -6,10 +6,9 @@ import axios from "axios";
 
 import type { EventData } from "@/types";
 
-const UNSPLASH_ACCESS_KEY = "lupsuJwSHzl-hAAA1me5EZbeKacjVF4Cm9pUrMm7G5M";
-const PIXABAY_API_KEY = "21909999-a5b2602ec6aa06aabab58a594";
-const PEXELS_API_KEY =
-  "hRtAlADLthp4daarvjmTMwOF8yQxrwbZqk8zclrdmTStJzXH7shZuuph";
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
+const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY;
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
 async function getPage(url: string) {
   const response = await fetch(url, {
